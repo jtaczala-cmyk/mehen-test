@@ -2,22 +2,16 @@ Copyright (c) 2026 Stop60. All rights reserved.
 
 PROPRIETARY LICENCE – NOT OPEN SOURCE
 
-This repository and the game it contains ("Mehen: Droga Węża"), including its code,
-texts, graphics, sounds and game design, are the property of Stop60 (rights holder).
+This repository and the game it contains ("Hefau"), including its code, texts, graphics,
+logo, app icons, sounds and game design, are the property of Stop60 (rights holder).
 
 You may play the game for free in a web browser for personal, non-commercial use.
 Without prior written permission from Stop60 you may not copy, modify, redistribute,
 republish, sell, host elsewhere or create derivative works from any part of this repository.
 
-The board, pieces, glyphs and all graphics are drawn procedurally at runtime (Canvas 2D);
-all sounds are generated procedurally at runtime (Web Audio API). The app icons
-(icon-*.png, apple-touch-icon.png, favicon-*.png) are original Stop60 artwork.
-No third-party image or audio assets are included.
+Third-party components (fonts and the QR code generator) are not covered by these terms;
+they remain under their own licences – see THIRD-PARTY-NOTICES.md.
 
-THIRD-PARTY FONT: index.html embeds a subset of the "Cinzel" typeface,
-Copyright 2020 The Cinzel Project Authors (https://github.com/NDISCOVER/Cinzel),
-licensed under the SIL Open Font License, Version 1.1 — see OFL-Cinzel.txt.
-The Stop60 proprietary terms above do not apply to that font. Mehen is a historical ancient Egyptian game; this is an original
-digital adaptation.
+Hefau is an original digital game inspired by the historical ancient Egyptian board game mehen.
 
 THE GAME IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
