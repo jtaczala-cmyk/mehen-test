@@ -1,0 +1,18 @@
+Copyright (c) 2026 Stop60. All rights reserved.
+
+PROPRIETARY LICENCE – NOT OPEN SOURCE
+
+This repository and the game it contains ("Mehen: Droga Węża"), including its code,
+texts, graphics, sounds and game design, are the property of Stop60 (rights holder).
+
+You may play the game for free in a web browser for personal, non-commercial use.
+Without prior written permission from Stop60 you may not copy, modify, redistribute,
+republish, sell, host elsewhere or create derivative works from any part of this repository.
+
+The board, pieces, glyphs and all graphics are drawn procedurally at runtime (Canvas 2D);
+all sounds are generated procedurally at runtime (Web Audio API). No third-party image,
+audio or font assets are included. Emoji/glyph characters are rendered by the player's
+operating system. Mehen is a historical ancient Egyptian game; this is an original
+digital adaptation.
+
+THE GAME IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
