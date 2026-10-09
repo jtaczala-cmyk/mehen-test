@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="robots" content="noindex,nofollow" />
 <meta name="googlebot" content="noindex,nofollow" />
-<meta name="copyright" content="© 2026 Stop60" />
+<meta name="copyright" content="© 2026 Stop60 · All rights reserved" />
 <meta name="theme-color" content="#000000" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
@@ -328,6 +328,24 @@ body.introOn #app,body.introOn .ov{visibility:hidden}
 @media (max-width:360px){#menu .row .btn{font-size:13.5px;letter-spacing:.2px}}
 /* promo palette glow on panels (static, cheap) */
 .ov .card{box-shadow:0 0 0 1px rgba(242,193,78,.14),0 0 46px rgba(150,120,255,.16),0 0 90px rgba(63,224,208,.07),inset 0 1px 0 rgba(242,193,78,.14)}
+/* ===== v6 cobra emblem at the spiral centre: head + spread hood, compositor-only motion ===== */
+#cobra{position:absolute;pointer-events:none;transform-origin:50% 84%;animation:cbSway 7.4s ease-in-out infinite;will-change:transform}
+#cobra canvas{position:absolute;left:0;top:0;width:100%;height:100%}
+#cbHood{transform-origin:50% 84%;animation:cbBreath 6.2s ease-in-out infinite;will-change:transform}
+#cbHead{transform-origin:50% 40%;animation:cbHeadBob 6.2s ease-in-out infinite;will-change:transform}
+#cbEyes{mix-blend-mode:screen;transform-origin:50% 40%;animation:cbHeadBob 6.2s ease-in-out infinite,cbGlow 2.9s ease-in-out infinite alternate;will-change:transform,opacity}
+#cbTongue{transform-origin:50% 37%;transform:scaleY(0);animation:cbTongue 5.3s linear infinite;will-change:transform}
+@keyframes cbSway{0%,100%{transform:rotate(-1.3deg)}50%{transform:rotate(1.3deg)}}
+@keyframes cbBreath{0%,100%{transform:scale(1,1)}38%{transform:scale(1.035,1.01)}50%{transform:scale(1.075,1.02)}62%{transform:scale(1.03,1.008)}}
+@keyframes cbHeadBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.1%)}}
+@keyframes cbGlow{0%{opacity:.45}100%{opacity:1}}
+@keyframes cbTongue{0%,86%{transform:scaleY(0)}88%{transform:scaleY(1)}90%{transform:scaleY(.35)}92%{transform:scaleY(1)}94.5%,100%{transform:scaleY(0)}}
+@media (prefers-reduced-motion:reduce){#cobra,#cbHood,#cbHead,#cbEyes,#cbTongue{animation:none}#cbEyes{opacity:.85}}
+#cbShine{position:absolute;inset:0;transform-origin:50% 84%;-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;mix-blend-mode:screen;
+  background:linear-gradient(112deg,transparent 0 46.5%,rgba(255,236,170,.35) 48.6%,rgba(255,252,232,.9) 50%,rgba(255,236,170,.35) 51.4%,transparent 53.5% 100%) no-repeat;background-size:420% 100%;background-position:115% 0;
+  animation:cbBreath 6.2s ease-in-out infinite,cbShine 8.3s ease-in-out infinite;will-change:transform}
+@keyframes cbShine{0%,72%{background-position:115% 0}100%{background-position:-15% 0}}
+@media (prefers-reduced-motion:reduce){#cbShine{animation:none;display:none}}
 
 </style>
 </head>
@@ -345,7 +363,7 @@ body.introOn #app,body.introOn .ov{visibility:hidden}
     <div class="pl" data-p="1"><img class="av" alt="" /><div class="pinfo"><div class="nm"><span class="pn"></span></div><div class="tray"></div><div class="prog"><i></i></div></div></div>
   </section>
   <section id="boardWrap">
-    <div id="stage"><canvas id="bgL" class="lay"></canvas><canvas id="ringL" class="lay"></canvas><canvas id="bodyL" class="lay"></canvas><canvas id="sunL"></canvas><canvas id="board"></canvas><div id="netBar" hidden><i></i><span></span></div></div>
+    <div id="stage"><canvas id="bgL" class="lay"></canvas><canvas id="ringL" class="lay"></canvas><canvas id="bodyL" class="lay"></canvas><canvas id="sunL"></canvas><div id="cobra" aria-hidden="true"><canvas id="cbHood"></canvas><div id="cbShine"></div><canvas id="cbTongue"></canvas><canvas id="cbHead"></canvas><canvas id="cbEyes"></canvas></div><canvas id="board"></canvas><div id="netBar" hidden><i></i><span></span></div></div>
     <div id="throwFx"><canvas id="throwCv" width="720" height="343"></canvas></div>
     <div id="banner"></div>
     <div id="hint"></div>
@@ -354,7 +372,7 @@ body.introOn #app,body.introOn .ov{visibility:hidden}
     <div id="status"></div>
     <button id="rollBtn" data-t="roll">Rzuć</button>
   </section>
-  <footer id="foot">© 2026 Stop60</footer>
+  <footer id="foot">© 2026 Stop60 · All rights reserved</footer>
 </div>
 
 <div class="ov" id="menu" hidden><div class="card">
@@ -795,7 +813,7 @@ var G = { segs: [] }, TURNS = 2.75;
 function computeGeo(size) {
   var g = { size: size, c: size / 2 };
   var c = g.c, pitch = (size * 0.468 - size * 0.13) / (TURNS + 0.6), w = pitch * 0.9, rIn = size * 0.13 + pitch * 0.15, rOut = rIn + pitch * TURNS;
-  var th1 = TURNS * Math.PI * 2, rot = -Math.PI / 2;
+  var th1 = TURNS * Math.PI * 2, rot = Math.PI / 2; // the track ends at the bottom of the goal disc, so the cobra can rise upward into the widest free space
   function rAt(th) { return rIn + (rOut - rIn) * th / th1; }
   var M = 1400, pts = [], len = [0], j;
   for (j = 0; j <= M; j++) { var th = th1 - th1 * j / M, r = rAt(th); pts.push({ th: th, r: r }); if (j) { var a = pts[j - 1]; len.push(len[j - 1] + Math.hypot(r * Math.cos(th) - a.r * Math.cos(a.th), r * Math.sin(th) - a.r * Math.sin(a.th))); } }
@@ -1034,7 +1052,10 @@ function paintBody(c, g, opts) {
   }
   // home gate on the tail
   c.save(); c.strokeStyle = 'rgba(242,193,78,.7)'; c.setLineDash([2.5, 2.5]); c.lineWidth = 1.2; c.beginPath(); c.arc(g.entry.x, g.entry.y, w * 0.36, 0, 7); c.stroke(); c.restore();
-  paintHead(c, g);
+  // the track ends at the goal disc with a gold collar; the cobra emblem itself lives in its own layers (see c1c_cobra.js)
+  var ef = g.frame(g.total - 0.4), ew = g.w * 0.46; c.save(); c.translate(ef.x, ef.y); c.rotate(Math.atan2(ef.ty, ef.tx));
+  c.strokeStyle = '#f2c14e'; c.shadowColor = '#f2c14e'; c.shadowBlur = 4; c.lineWidth = 1.6; c.beginPath(); c.moveTo(0, -ew); c.lineTo(0, ew); c.stroke(); c.restore();
+  if (opts.cobra) paintCobraStatic(c, g.c, g.c - g.headR * COBRA_LIFT, g.headR * COBRA_SCALE);
 }
 function hoodShape(Lh, w) { // spread cobra hood seen from above (x along head direction)
   var p = new Path2D(), hw = w * 0.86;
@@ -1133,13 +1154,13 @@ function layout() {
   c = boardCv.getContext('2d'); c.setTransform(DPR, 0, 0, DPR, 0, 0); paintBody(c, G, { numbers: true });
   if (typeof prepFxLayers === 'function') prepFxLayers();
   BODY = bodyPath(G, 1);
-  buildSprites(); initDust();
+  buildSprites(); initDust(); buildCobra();
   var su = $('sunL'), sz = G.headR * 4.4; su.width = SPR.sun.width; su.height = SPR.sun.height; su.getContext('2d').drawImage(SPR.sun, 0, 0);
   su.style.width = su.style.height = sz + 'px'; su.style.left = su.style.top = (G.c - sz / 2) + 'px';
 }
 function posXY(pos, p, i) {
   if (pos <= 0) return { x: G.entry.x, y: G.entry.y };
-  if (pos >= MC.HEAD) { var side = p ? -1 : 1, a = G.head.ang + side * (Math.PI * (0.3 + (i || 0) * 0.22)), rr = G.headR * 0.8; return { x: G.c + rr * Math.cos(a), y: G.c + rr * Math.sin(a) }; }
+  if (pos >= MC.HEAD) { var side = p ? 1 : -1, a = Math.PI / 2 + side * (Math.PI * (0.1 + (i || 0) * 0.14)), rr = G.headR * 0.86; return { x: G.c + rr * Math.cos(a), y: G.c + rr * Math.sin(a) }; }
   return { x: G.segs[pos].x, y: G.segs[pos].y };
 }
 var dust = [];
@@ -1263,6 +1284,186 @@ function introWav() {
   });
 }
 
+/* ======================= ART: the cobra emblem at the spiral centre (goal) =======================
+   Frontal uraeus: head + spread hood only. Painted once per layout into small layers;
+   all motion (hood breathing, sway, eye glow, tongue flick) is CSS transform/opacity on the compositor. */
+var COBRA = { O: { x: 0, y: 0.12 } };
+function cobraHoodPts(s, neck) { // outline polyline in unit coords (1 = goal radius); s scales about COBRA.O
+  var key = s + (neck ? 'n' : ''); COBRA.cache = COBRA.cache || {}; if (COBRA.cache[key]) return COBRA.cache[key];
+  var O = COBRA.O, out = [];
+  function bez(a, b, c2, d, n, skip) { for (var i = skip ? 1 : 0; i <= n; i++) { var t = i / n, m = 1 - t; out.push([m * m * m * a[0] + 3 * m * m * t * b[0] + 3 * m * t * t * c2[0] + t * t * t * d[0], m * m * m * a[1] + 3 * m * m * t * b[1] + 3 * m * t * t * c2[1] + t * t * t * d[1]]); } }
+  var R = [[0, -0.70], [0.27, -0.86], [0.62, -0.66], [0.69, -0.30], [0.75, 0.04], [0.40, 0.52], [0.13, 0.79]];
+  bez(R[0], R[1], R[2], R[3], 40); bez(R[3], R[4], R[5], R[6], 40, true);
+  if (neck) { bez([0.13, 0.79], [0.115, 0.85], [0.1, 0.9], [0.095, 0.98], 8, true); bez([-0.095, 0.98], [-0.1, 0.9], [-0.115, 0.85], [-0.13, 0.79], 8); }
+  var L = R.map(function (q) { return [-q[0], q[1]]; }).reverse();
+  bez(L[0], L[1], L[2], L[3], 40, !neck ? false : true); bez(L[3], L[4], L[5], L[6], 40, true);
+  out = out.map(function (q) { return [O.x + (q[0] - O.x) * s, O.y + (q[1] - O.y) * s]; });
+  return (COBRA.cache[key] = out);
+}
+function cobraHoodPath(s, neck) { var pts = cobraHoodPts(s, neck), p = new Path2D(); p.moveTo(pts[0][0], pts[0][1]); for (var i = 1; i < pts.length; i++) p.lineTo(pts[i][0], pts[i][1]); p.closePath(); return p; }
+function cobraRayHit(s, a) { // distance from O to the outline (scale s) along angle a
+  var O = COBRA.O, pts = cobraHoodPts(s), best = 1e9, d = 0.5;
+  pts.forEach(function (q) { var dx = q[0] - O.x, dy = q[1] - O.y, da = Math.abs(Math.atan2(Math.sin(Math.atan2(dy, dx) - a), Math.cos(Math.atan2(dy, dx) - a))); if (da < best) { best = da; d = Math.hypot(dx, dy); } });
+  return d;
+}
+function cobraHeadPath() { // frontal cobra head: elongated spade, flat crown, temples behind the eyes, narrow rounded snout
+  var p = new Path2D();
+  p.moveTo(0, -0.95);
+  p.bezierCurveTo(0.1, -0.955, 0.178, -0.91, 0.192, -0.82);
+  p.bezierCurveTo(0.205, -0.74, 0.2, -0.66, 0.178, -0.59);
+  p.bezierCurveTo(0.15, -0.5, 0.1, -0.42, 0.06, -0.365);
+  p.bezierCurveTo(0.04, -0.34, 0.02, -0.333, 0, -0.333);
+  p.bezierCurveTo(-0.02, -0.333, -0.04, -0.34, -0.06, -0.365);
+  p.bezierCurveTo(-0.1, -0.42, -0.15, -0.5, -0.178, -0.59);
+  p.bezierCurveTo(-0.2, -0.66, -0.205, -0.74, -0.192, -0.82);
+  p.bezierCurveTo(-0.178, -0.91, -0.1, -0.955, 0, -0.95);
+  p.closePath(); return p;
+}
+function cobraGem(c, x, y, r, k, a) { var j = JEWEL[k], g = c.createRadialGradient(x - r * 0.35, y - r * 0.45, r * 0.04, x, y, r * 1.25); g.addColorStop(0, j[0]); g.addColorStop(0.5, j[1]); g.addColorStop(1, j[2]); return g; }
+function cobraRing(c, s0, s1, kind, cells, rot) { // a cloisonné band between two scaled hood outlines, cut into gem cells
+  var O = COBRA.O, outer = cobraHoodPath(s0), band = new Path2D(); band.addPath(outer); band.addPath(cobraHoodPath(s1));
+  c.save(); c.clip(band, 'evenodd');
+  var R = 1.6, mid = (s0 + s1) / 2;
+  for (var i = 0; i < cells; i++) {
+    var a0 = rot + i / cells * Math.PI * 2, a1 = rot + (i + 1) / cells * Math.PI * 2, am = (a0 + a1) / 2;
+    var w = new Path2D(); w.moveTo(O.x, O.y); w.lineTo(O.x + Math.cos(a0) * R, O.y + Math.sin(a0) * R); w.lineTo(O.x + Math.cos(am) * R * 1.05, O.y + Math.sin(am) * R * 1.05); w.lineTo(O.x + Math.cos(a1) * R, O.y + Math.sin(a1) * R); w.closePath();
+    // cell centre ≈ where the mid-outline crosses this ray (estimate from the hood's local radius)
+    var rr = cobraRayHit(mid, am), cxp = O.x + Math.cos(am) * rr, cyp = O.y + Math.sin(am) * rr;
+    c.fillStyle = cobraGem(c, cxp, cyp, Math.max(0.03, (s0 - s1) * rr / mid * 0.75), kind); c.fill(w);
+  }
+  // gold cloisons: radial walls with a dark groove under them
+  c.lineCap = 'round';
+  for (var pass = 0; pass < 2; pass++) {
+    c.strokeStyle = pass ? '#ffe29a' : 'rgba(40,20,0,.85)'; c.lineWidth = pass ? 0.011 : 0.022;
+    c.beginPath(); for (i = 0; i < cells; i++) { var aa = rot + i / cells * Math.PI * 2; c.moveTo(O.x, O.y); c.lineTo(O.x + Math.cos(aa) * R, O.y + Math.sin(aa) * R); } c.stroke();
+  }
+  c.restore();
+  c.strokeStyle = 'rgba(40,20,0,.8)'; c.lineWidth = 0.024; c.stroke(cobraHoodPath(s1)); c.strokeStyle = '#ffe7a8'; c.lineWidth = 0.012; c.stroke(cobraHoodPath(s1));
+}
+function paintCobraHood(c) {
+  var full = cobraHoodPath(1, true), hood = cobraHoodPath(1), k;
+  // outer aura (violet / turquoise like the promo spiral light) + drop shadow
+  c.save(); c.shadowColor = 'rgba(170,140,255,.75)'; c.shadowBlur = 0.16 * COBRA.px; c.fillStyle = '#1a1206'; c.fill(full); c.restore();
+  c.save(); c.shadowColor = 'rgba(0,0,0,.9)'; c.shadowBlur = 0.08 * COBRA.px; c.shadowOffsetY = 0.04 * COBRA.px; c.fillStyle = '#120b03'; c.fill(full); c.restore();
+  // metal base: warm gold, brighter on the upper left (candle light), deep at the edges
+  var mg = c.createLinearGradient(-0.7, -0.6, 0.7, 0.8); mg.addColorStop(0, '#fff1bf'); mg.addColorStop(0.25, '#f2c14e'); mg.addColorStop(0.6, '#b07a1c'); mg.addColorStop(1, '#5a3608');
+  c.fillStyle = mg; c.fill(full);
+  // neck: ventral scale rings
+  // cloisonné bands
+  cobraRing(c, 0.905, 0.745, 'lapis', 26, -Math.PI / 2 + 0.06);
+  cobraRing(c, 0.71, 0.555, 'turq', 22, -Math.PI / 2);
+  cobraRing(c, 0.52, 0.385, 'carn', 16, -Math.PI / 2 + 0.1);
+  // gold bead row between lapis and turquoise
+  c.save(); c.clip(hood);
+  var bead = cobraHoodPts(0.728), step = 4;
+  for (k = 0; k < bead.length; k += step) { var bx = bead[k][0], by = bead[k][1]; if (by > 0.70) continue;
+    var bg = c.createRadialGradient(bx - 0.006, by - 0.008, 0.001, bx, by, 0.016); bg.addColorStop(0, '#fffbe0'); bg.addColorStop(0.5, '#f2c14e'); bg.addColorStop(1, '#6b4308'); c.fillStyle = bg; c.beginPath(); c.arc(bx, by, 0.0125, 0, 7); c.fill(); }
+  c.restore();
+  // engraved feather chevrons in the gold core
+  c.save(); c.clip(cobraHoodPath(0.37)); c.strokeStyle = 'rgba(90,50,0,.35)'; c.lineWidth = 0.006;
+  for (k = 0; k < 12; k++) { var cy = -0.2 + k * 0.07; c.beginPath(); c.moveTo(-0.4, cy - 0.1); c.lineTo(0, cy + 0.05); c.lineTo(0.4, cy - 0.1); c.stroke(); } c.restore();
+  // ventral (throat) scales down the hood centre into the neck; drawn bottom-up so each scale overlaps the one below
+  var plates = [], yy = -0.43, n = 19;
+  for (k = 0; k < n; k++) { var t = k / (n - 1), hh = 0.098 - t * 0.03; plates.push({ y: yy, hh: hh, hw: 0.104 - t * 0.026 }); yy += hh * 0.92; }
+  for (k = n - 1; k >= 0; k--) { var P = plates[k], hw = P.hw, y0 = P.y, yb = y0 + P.hh;
+    var sp = new Path2D(); sp.moveTo(-hw, y0); sp.quadraticCurveTo(0, y0 - P.hh * 0.16, hw, y0); sp.lineTo(hw * 0.97, yb - P.hh * 0.12); sp.quadraticCurveTo(0, yb + P.hh * 0.22, -hw * 0.97, yb - P.hh * 0.12); sp.closePath();
+    c.save(); c.shadowColor = 'rgba(20,8,0,.75)'; c.shadowBlur = 0.022 * COBRA.px; c.shadowOffsetY = 0.01 * COBRA.px;
+    var sg = c.createLinearGradient(-hw, 0, hw, 0); sg.addColorStop(0, '#8a5a12'); sg.addColorStop(0.25, '#e9b84e'); sg.addColorStop(0.45, '#fbe7a6'); sg.addColorStop(0.65, '#efbd52'); sg.addColorStop(1, '#7a4e10');
+    c.fillStyle = sg; c.fill(sp); c.restore();
+    c.save(); c.clip(sp); var vg = c.createLinearGradient(0, y0, 0, yb); vg.addColorStop(0, 'rgba(40,18,0,.45)'); vg.addColorStop(0.35, 'rgba(40,18,0,0)'); vg.addColorStop(0.85, 'rgba(255,250,225,.18)'); vg.addColorStop(1, 'rgba(40,18,0,.2)'); c.fillStyle = vg; c.fillRect(-0.3, y0 - 0.05, 0.6, P.hh + 0.1); c.restore();
+    c.strokeStyle = 'rgba(70,36,0,.8)'; c.lineWidth = 0.006; c.stroke(sp);
+    if (k % 3 === 1 && k < n - 2) { c.fillStyle = cobraGem(c, 0, y0 + P.hh * 0.5, hw * 0.4, 'lapis'); c.beginPath(); c.moveTo(-hw * 0.32, y0 + P.hh * 0.5); c.lineTo(0, y0 + P.hh * 0.3); c.lineTo(hw * 0.32, y0 + P.hh * 0.5); c.lineTo(0, y0 + P.hh * 0.72); c.closePath(); c.fill(); c.strokeStyle = '#ffe29a'; c.lineWidth = 0.005; c.stroke(); }
+  }
+  // inner shading along the rim (depth) + glossy candle highlight
+  c.save(); c.clip(full);
+  c.strokeStyle = 'rgba(20,8,0,.55)'; c.lineWidth = 0.09; c.stroke(full);
+  var hl = c.createRadialGradient(-0.28, -0.36, 0.02, -0.28, -0.36, 0.62); hl.addColorStop(0, 'rgba(255,250,225,.42)'); hl.addColorStop(0.45, 'rgba(255,240,200,.10)'); hl.addColorStop(1, 'rgba(255,240,200,0)');
+  c.fillStyle = hl; c.fillRect(-1, -1, 2, 2);
+  var lo = c.createLinearGradient(0, 0.1, 0, 1); lo.addColorStop(0, 'rgba(60,10,40,0)'); lo.addColorStop(1, 'rgba(60,10,40,.35)'); c.fillStyle = lo; c.fillRect(-1, 0, 2, 1); // violet-red bounce light from below
+  c.restore();
+  // rim: bright gold wire with a turquoise inner hairline
+  c.save(); c.shadowColor = 'rgba(255,214,120,.9)'; c.shadowBlur = 0.04 * COBRA.px; c.strokeStyle = '#ffe39a'; c.lineWidth = 0.022; c.stroke(full); c.restore();
+  c.strokeStyle = 'rgba(63,224,208,.55)'; c.lineWidth = 0.007; c.stroke(cobraHoodPath(0.955));
+  c.strokeStyle = '#3a2206'; c.lineWidth = 0.006; c.stroke(full);
+  c.save(); c.globalCompositeOperation = 'destination-out'; var fd = c.createLinearGradient(0, 0.7, 0, 0.9); fd.addColorStop(0, 'rgba(0,0,0,0)'); fd.addColorStop(1, 'rgba(0,0,0,1)'); c.fillStyle = fd; c.fillRect(-0.5, 0.7, 1, 0.5); c.restore();
+}
+var CB_EYE = { x: 0.142, y: -0.655 };
+function paintCobraHead(c) {
+  var hp = cobraHeadPath();
+  c.save(); c.shadowColor = 'rgba(0,0,0,.85)'; c.shadowBlur = 0.08 * COBRA.px; c.shadowOffsetY = 0.035 * COBRA.px; c.fillStyle = '#1a0f02'; c.fill(hp); c.restore();
+  var g = c.createLinearGradient(-0.25, 0, 0.25, 0); g.addColorStop(0, '#4a2c06'); g.addColorStop(0.2, '#c99032'); g.addColorStop(0.42, '#fff2c4'); g.addColorStop(0.58, '#f2c14e'); g.addColorStop(0.82, '#a36c16'); g.addColorStop(1, '#4a2c06');
+  c.fillStyle = g; c.fill(hp);
+  c.save(); c.clip(hp);
+  // crown: lapis / turquoise stripes between gold cloisons (royal uraeus), converging toward the snout
+  [-0.07, 0, 0.07].forEach(function (x, i) { var st = new Path2D(); st.moveTo(x * 1.1 - 0.021, -0.97); st.lineTo(x * 1.1 + 0.021, -0.97); st.lineTo(x * 0.5 + 0.013, -0.75); st.lineTo(x * 0.5 - 0.013, -0.75); st.closePath();
+    c.fillStyle = cobraGem(c, x, -0.86, 0.06, i === 1 ? 'turq' : 'lapis'); c.fill(st); c.strokeStyle = '#ffe29a'; c.lineWidth = 0.007; c.stroke(st); });
+  // sculpting: crown lit from above, snout & jaw turning away into shadow, a soft ridge down the middle
+  var vg = c.createLinearGradient(0, -0.95, 0, -0.33); vg.addColorStop(0, 'rgba(255,248,220,.28)'); vg.addColorStop(0.45, 'rgba(255,248,220,0)'); vg.addColorStop(0.8, 'rgba(60,26,0,.18)'); vg.addColorStop(1, 'rgba(60,26,0,.42)'); c.fillStyle = vg; c.fillRect(-0.3, -1, 0.6, 0.7);
+  [-1, 1].forEach(function (d) { var ch = c.createRadialGradient(d * 0.15, -0.55, 0.01, d * 0.15, -0.55, 0.12); ch.addColorStop(0, 'rgba(50,20,0,.4)'); ch.addColorStop(1, 'rgba(50,20,0,0)'); c.fillStyle = ch; c.fillRect(-0.3, -0.75, 0.6, 0.4); });
+  var rg = c.createLinearGradient(-0.03, 0, 0.03, 0); rg.addColorStop(0, 'rgba(255,250,230,0)'); rg.addColorStop(0.5, 'rgba(255,250,230,.38)'); rg.addColorStop(1, 'rgba(255,250,230,0)'); c.fillStyle = rg; c.fillRect(-0.03, -0.74, 0.06, 0.34);
+  var sn = c.createRadialGradient(0, -0.37, 0.002, 0, -0.37, 0.05); sn.addColorStop(0, 'rgba(255,245,210,.5)'); sn.addColorStop(1, 'rgba(255,245,210,0)'); c.fillStyle = sn; c.fillRect(-0.06, -0.43, 0.12, 0.1);
+  c.strokeStyle = 'rgba(80,44,0,.35)'; c.lineWidth = 0.005; c.beginPath(); c.moveTo(-0.12, -0.75); c.quadraticCurveTo(0, -0.722, 0.12, -0.75); c.stroke();
+  // supraocular plates: a soft raised lip above each eye
+  [-1, 1].forEach(function (d) { c.strokeStyle = 'rgba(255,248,220,.42)'; c.lineWidth = 0.009; c.beginPath(); c.moveTo(d * 0.1, -0.705); c.quadraticCurveTo(d * 0.145, -0.722, d * 0.185, -0.695); c.stroke(); });
+  // jaw shading toward the sides and under the snout, warm highlight on the crown
+  var jw = c.createRadialGradient(0, -0.7, 0.13, 0, -0.64, 0.33); jw.addColorStop(0, 'rgba(0,0,0,0)'); jw.addColorStop(1, 'rgba(40,16,0,.5)'); c.fillStyle = jw; c.fillRect(-0.3, -1, 0.6, 0.7);
+  var hl = c.createRadialGradient(-0.06, -0.86, 0.005, -0.06, -0.86, 0.2); hl.addColorStop(0, 'rgba(255,255,240,.6)'); hl.addColorStop(1, 'rgba(255,255,240,0)'); c.fillStyle = hl; c.fillRect(-0.3, -1, 0.6, 0.6);
+  c.restore();
+  c.strokeStyle = '#ffe39a'; c.lineWidth = 0.012; c.stroke(hp); c.strokeStyle = 'rgba(40,20,0,.7)'; c.lineWidth = 0.004; c.stroke(hp);
+  // eyes: kohl-lined almonds set on the sides of the head, amber iris, vertical slit
+  [-1, 1].forEach(function (d) {
+    c.save(); c.translate(d * CB_EYE.x, CB_EYE.y); c.scale(d * 1.15, 1.15); c.rotate(0.42);
+    var al = new Path2D(); al.moveTo(-0.05, 0.004); al.quadraticCurveTo(0.005, -0.046, 0.058, 0); al.quadraticCurveTo(0.005, 0.036, -0.05, 0.004); al.closePath();
+    c.fillStyle = '#0b0602'; c.save(); c.scale(1.3, 1.45); c.fill(al); c.restore();
+    var ig = c.createRadialGradient(-0.008, -0.012, 0.002, 0, 0, 0.052); ig.addColorStop(0, '#fffbe0'); ig.addColorStop(0.3, '#ffd257'); ig.addColorStop(0.72, '#e08a12'); ig.addColorStop(1, '#5a2a00');
+    c.fillStyle = ig; c.fill(al);
+    c.fillStyle = '#050200'; c.beginPath(); c.ellipse(0.004, 0.0, 0.008, 0.029, 0, 0, 7); c.fill();
+    c.fillStyle = 'rgba(255,255,255,.92)'; c.beginPath(); c.arc(-0.014, -0.013, 0.007, 0, 7); c.fill();
+    c.strokeStyle = '#0b0602'; c.lineWidth = 0.013; c.lineCap = 'round'; c.beginPath(); c.moveTo(0.06, 0.002); c.quadraticCurveTo(0.082, 0.01, 0.094, 0.028); c.stroke(); // kohl wing
+    c.restore();
+  });
+  // nostrils at the snout tip
+  c.fillStyle = '#2a1604'; [-1, 1].forEach(function (d) { c.beginPath(); c.ellipse(d * 0.022, -0.36, 0.0085, 0.0055, d * 0.6, 0, 7); c.fill(); });
+}
+function paintCobraEyeGlow(c) {
+  [-1, 1].forEach(function (d) { var x = d * CB_EYE.x, y = CB_EYE.y, g = c.createRadialGradient(x, y, 0.004, x, y, 0.095);
+    g.addColorStop(0, 'rgba(255,240,170,.9)'); g.addColorStop(0.3, 'rgba(255,190,60,.45)'); g.addColorStop(1, 'rgba(255,150,30,0)'); c.fillStyle = g; c.beginPath(); c.arc(x, y, 0.095, 0, 7); c.fill(); });
+}
+function paintCobraTongue(c) {
+  var t = new Path2D(); t.moveTo(-0.008, -0.39); t.lineTo(0.008, -0.39); t.lineTo(0.006, -0.25); t.quadraticCurveTo(0.03, -0.21, 0.05, -0.175); t.lineTo(0.044, -0.17); t.quadraticCurveTo(0.022, -0.2, 0, -0.23);
+  t.quadraticCurveTo(-0.022, -0.2, -0.044, -0.17); t.lineTo(-0.05, -0.175); t.quadraticCurveTo(-0.03, -0.21, -0.006, -0.25); t.closePath();
+  c.save(); c.shadowColor = 'rgba(255,60,90,.7)'; c.shadowBlur = 0.02 * COBRA.px; var g = c.createLinearGradient(0, -0.39, 0, -0.17); g.addColorStop(0, '#7a0c1c'); g.addColorStop(1, '#ff3b5c'); c.fillStyle = g; c.fill(t); c.restore();
+}
+var COBRA_BOX = 2.3, COBRA_SCALE = 1.42, COBRA_LIFT = 0.16; // emblem size vs. goal disc; lifted so the neck fades out before the track's end // layer box in units (centre ± 1.15)
+function cobraLayer(px, fn) { var cnv = document.createElement('canvas'), n = Math.ceil(px * COBRA_BOX); cnv.width = cnv.height = n; var c = cnv.getContext('2d'); c.setTransform(px, 0, 0, px, n / 2, n / 2); fn(c); return cnv; }
+function paintCobraStatic(c, cx0, cy0, R) { // single static render (menu art)
+  var k = c.getTransform ? c.getTransform().a : 1, px = R * k; COBRA.px = px;
+  var L = cobraLayer(px, function (x) { paintCobraHood(x); paintCobraHead(x); x.globalCompositeOperation = 'lighter'; x.globalAlpha = 0.8; paintCobraEyeGlow(x); });
+  var S = R * COBRA_BOX; c.drawImage(L, cx0 - S / 2, cy0 - S / 2, S, S);
+}
+function buildCobra() { // DOM layers on the game board
+  var box = $('cobra'); if (!box) return; var R = G.headR * COBRA_SCALE, px = R * DPR; COBRA.px = px;
+  var S = R * COBRA_BOX; box.style.width = box.style.height = S + 'px'; box.style.left = (G.c - S / 2) + 'px'; box.style.top = (G.c - G.headR * COBRA_LIFT - S / 2) + 'px';
+  var map = { cbHood: paintCobraHood, cbTongue: paintCobraTongue, cbHead: paintCobraHead, cbEyes: paintCobraEyeGlow };
+  // gold glint that sweeps across the hood now and then: a CSS gradient masked by the hood silhouette
+  var sil = cobraLayer(Math.min(px, 160), function (c) { c.fillStyle = '#fff'; c.fill(cobraHoodPath(0.97)); }), sh = $('cbShine'), mu = 'url(' + sil.toDataURL() + ')';
+  sh.style.webkitMaskImage = sh.style.maskImage = mu;
+  Object.keys(map).forEach(function (id) { var el = $(id), src = cobraLayer(px, map[id]); el.width = src.width; el.height = src.height; el.getContext('2d').drawImage(src, 0, 0); });
+}
+function cobraClearance() { // min distance (px) between the cobra silhouette (hood at full spread, head, neck) and any track square; <0 = overlap
+  var R = G.headR * COBRA_SCALE, cx0 = G.c, cy0 = G.c - G.headR * COBRA_LIFT, pts = [];
+  cobraHoodPts(1, true).forEach(function (q) { if (q[1] < 0.8) pts.push([q[0] * 1.08, q[1] * 1.02 + (q[1] - 0.84) * 0]); });
+  var hp = [[0, -0.95], [0.192, -0.82], [0.2, -0.7], [-0.192, -0.82], [-0.2, -0.7], [0.1, -0.94], [-0.1, -0.94]]; pts = pts.concat(hp);
+  var best = 1e9;
+  function inPoly(x, y, poly) { var ins = false; for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) { var a = poly[i], b = poly[j]; if ((a.y > y) !== (b.y > y) && x < (b.x - a.x) * (y - a.y) / (b.y - a.y) + a.x) ins = !ins; } return ins; }
+  function dSeg(x, y, a, b) { var dx = b.x - a.x, dy = b.y - a.y, t = Math.max(0, Math.min(1, ((x - a.x) * dx + (y - a.y) * dy) / (dx * dx + dy * dy || 1))); return Math.hypot(x - a.x - t * dx, y - a.y - t * dy); }
+  pts.forEach(function (q) { var x = cx0 + q[0] * R, y = cy0 + q[1] * R;
+    for (var k = 1; k <= MC.N; k++) { var poly = G.segs[k].poly; if (inPoly(x, y, poly)) { best = Math.min(best, -1); continue; } for (var i = 0; i < poly.length; i++) best = Math.min(best, dSeg(x, y, poly[i], poly[(i + 1) % poly.length])); } });
+  return Math.round(best * 10) / 10;
+}
+if (DEBUG) window.__cobraClear = cobraClearance;
+if (DEBUG) window.__cobra = function (c, x, y, r) { paintCobraStatic(c, x, y, r); };
+
 var disp = null, trail = null, fxParts = [];
 function legalNow() { if (!S || S.phase !== 'move' || busy || !ctl(S.turn) || !$('mini').hidden) return []; return MC.legalMoves(S, S.turn, S.roll); }
 var perf = { n: 0, sum: 0, max: 0, f: 0 };
@@ -1301,15 +1502,6 @@ function render() {
     cx.globalAlpha = 1; cx.drawImage(sheenCv, 0, 0, SZ, SZ);
   }
   cx.globalCompositeOperation = 'source-over'; cx.globalAlpha = 1;
-  // serpent eyes glow + tongue
-  var H = G.head, Lh = H.len, w = G.w;
-  cx.save(); cx.translate(H.x, H.y); cx.rotate(H.ang);
-  cx.globalCompositeOperation = 'lighter'; cx.globalAlpha = 0.35 + 0.35 * Math.sin(now / 300) * Math.sin(now / 300);
-  [-1, 1].forEach(function (d) { cx.drawImage(SPR.glow, H.eyeX - w * 0.24, d * H.eyeY - w * 0.24, w * 0.48, w * 0.48); });
-  cx.globalCompositeOperation = 'source-over'; cx.globalAlpha = 1;
-  var tph = (now % 3400) / 3400;
-  if (tph < 0.09) { var tl = w * 0.55 * Math.sin(tph / 0.09 * Math.PI); cx.strokeStyle = '#ff3b5c'; cx.lineWidth = 1.6; cx.lineCap = 'round'; cx.beginPath(); cx.moveTo(Lh * 1.02, 0); cx.lineTo(Lh * 1.04 + tl * 0.7, 0); cx.lineTo(Lh * 1.04 + tl, -tl * 0.18); cx.moveTo(Lh * 1.04 + tl * 0.7, 0); cx.lineTo(Lh * 1.04 + tl, tl * 0.18); cx.stroke(); }
-  cx.restore();
   var lm = legalNow(), pulse = 0.5 + 0.5 * Math.sin(now / 190);
   function plateHL(k, col, a) { var sp = hlSprite(k, col); cx.globalAlpha = Math.min(1, a); cx.drawImage(sp.c, sp.x, sp.y, sp.w, sp.h); cx.globalAlpha = 1; }
   if (!drag && FX.hl) lm.forEach(function (m) {
@@ -1793,7 +1985,7 @@ function drawMenuArt() {
   var cvm = $('menuArt'), c = cvm.getContext('2d'), W = cvm.width, g = computeGeo(W);
   c.clearRect(0, 0, W, W);
   var bg = c.createRadialGradient(W / 2, W / 2, W * 0.1, W / 2, W / 2, W * 0.5); bg.addColorStop(0, 'rgba(60,38,8,.9)'); bg.addColorStop(0.7, 'rgba(20,12,3,.6)'); bg.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = bg; c.beginPath(); c.arc(W / 2, W / 2, W * 0.5, 0, 7); c.fill();
-  paintRing(c, g); paintBody(c, g, { numbers: false });
+  paintRing(c, g); paintBody(c, g, { numbers: false, cobra: true });
   var hs = g.headR * 2.4; var sg = c.createRadialGradient(W / 2, W / 2, 0, W / 2, W / 2, hs); sg.addColorStop(0, 'rgba(255,200,90,.35)'); sg.addColorStop(1, 'rgba(255,160,40,0)'); c.globalCompositeOperation = 'lighter'; c.fillStyle = sg; c.fillRect(0, 0, W, W); c.globalCompositeOperation = 'source-over';
   drawLion(c, g.segs[3].x, g.segs[3].y, g.tokR * 1.05, 0); drawLion(c, g.segs[8].x, g.segs[8].y, g.tokR * 1.05, 1);
 }
